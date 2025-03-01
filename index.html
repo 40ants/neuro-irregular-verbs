@@ -1,0 +1,231 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Изучение неправильных глаголов</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 20px; }
+  .card { margin-bottom: 20px; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+  .progress { margin-top: 10px; height: 20px; background-color: #f3f3f3; }
+  .progress-bar { width: 0%; height: 100%; background-color: #4caf50; text-align: center; line-height: 20px; color: white; }
+  button { margin-right: 5px; font-size: 20px; padding: 10px 20px; border-radius: 5px; }
+  #check-button { background-color: #a5d6a7; border: none; cursor: pointer; }
+  #check-button:hover { background-color: #81c784; }
+  input[type="text"] { font-size: 20px; padding: 10px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ccc; width: 100%; box-sizing: border-box; }
+</style>
+</head>
+<body>
+
+<div id="app" class="card">
+  <h2>Изучение неправильных глаголов</h2>
+  <div>Прогресс: <span id="progress">0/10</span></div>
+  <div class="progress"><div id="progress-bar" class="progress-bar"></div></div>
+  <p id="verb-display">Глагол: <span id="current-verb"></span></p>
+  
+  <label for="past-simple-input">Past Simple:</label>
+  <input type="text" id="past-simple-input" placeholder="Введите форму Past Simple..." />
+  
+  <label for="participle-ii-input">Past Participle II:</label>
+  <input type="text" id="participle-ii-input" placeholder="Введите форму Past Participle II..." />
+  
+  <button id="check-button" onclick="checkAnswer()">Проверить</button>
+  <button onclick="nextVerb()">Следующий глагол</button>
+  <p id="feedback"></p>
+</div>
+
+<script>
+const verbs = [
+  { base: "arise", past: "arose", participle: "arisen", translation: "подниматься" },
+  { base: "awake", past: "awoke", participle: "awoken", translation: "пробуждать" },
+  { base: "be", past: "was(were)", participle: "been", translation: "быть" },
+  { base: "bear", past: "bore", participle: "born", translation: "рожать, переносить" },
+  { base: "beat", past: "beat", participle: "beaten", translation: "бить" },
+  { base: "become", past: "became", participle: "become", translation: "становиться" },
+  { base: "begin", past: "began", participle: "begun", translation: "начинать" },
+  { base: "bend", past: "bent", participle: "bent", translation: "наклонять" },
+  { base: "bet", past: "bet", participle: "bet", translation: "заключать пари" },
+  { base: "bind", past: "bound", participle: "bound", translation: "связывать" },
+  { base: "bite", past: "bit", participle: "bitten", translation: "кусать" },
+  { base: "bleed", past: "bled", participle: "bled", translation: "кровоточить" },
+  { base: "blow", past: "blew", participle: "blown", translation: "дуть" },
+  { base: "break", past: "broke", participle: "broken", translation: "ломать" },
+  { base: "breed", past: "bred", participle: "bred", translation: "разводить животных" },
+  { base: "bring", past: "brought", participle: "brought", translation: "приносить" },
+  { base: "build", past: "built", participle: "built", translation: "строить" },
+  { base: "buy", past: "bought", participle: "bought", translation: "покупать" },
+  { base: "catch", past: "caught", participle: "caught", translation: "ловить" },
+  { base: "choose", past: "chose", participle: "chosen", translation: "выбирать" },
+  { base: "cling", past: "clung", participle: "clung", translation: "цепляться" },
+  { base: "come", past: "came", participle: "come", translation: "приходить" },
+  { base: "cost", past: "cost", participle: "cost", translation: "стоить" },
+  { base: "cut", past: "cut", participle: "cut", translation: "резать" },
+  { base: "deal", past: "dealt", participle: "dealt", translation: "вести дела" },
+  { base: "dig", past: "dug", participle: "dug", translation: "копать" },
+  { base: "do", past: "did", participle: "done", translation: "делать" },
+  { base: "draw", past: "drew", participle: "drawn", translation: "рисовать, тянуть" },
+  { base: "drink", past: "drank", participle: "drunk", translation: "пить" },
+  { base: "drive", past: "drove", participle: "driven", translation: "водить автомобиль" },
+  { base: "eat", past: "ate", participle: "eaten", translation: "кушать" },
+  { base: "fall", past: "fell", participle: "fallen", translation: "падать" },
+  { base: "feed", past: "fed", participle: "fed", translation: "кормить" },
+  { base: "feel", past: "felt", participle: "felt", translation: "чувствовать" },
+  { base: "fight", past: "fought", participle: "fought", translation: "бороться" },
+  { base: "find", past: "found", participle: "found", translation: "находить" },
+  { base: "flee", past: "fled", participle: "fled", translation: "сбегать" },
+  { base: "fly", past: "flew", participle: "flown", translation: "летать" },
+  { base: "forbid", past: "forbade", participle: "forbidden", translation: "запрещать" },
+  { base: "forget", past: "forgot", participle: "forgotten", translation: "забывать" },
+  { base: "forgive", past: "forgave", participle: "forgiven", translation: "прощать" },
+  { base: "freeze", past: "froze", participle: "frozen", translation: "замораживать" },
+  { base: "get", past: "got", participle: "got(gotten)", translation: "получать" },
+  { base: "give", past: "gave", participle: "given", translation: "давать" },
+  { base: "go", past: "went", participle: "gone", translation: "идти" },
+  { base: "grow", past: "grew", participle: "grown", translation: "расти" },
+  { base: "hang", past: "hung", participle: "hung", translation: "висеть" },
+  { base: "have", past: "had", participle: "had", translation: "иметь" },
+  { base: "hear", past: "heard", participle: "heard", translation: "слышать" },
+  { base: "hide", past: "hid", participle: "hidden", translation: "прятать" },
+  { base: "hit", past: "hit", participle: "hit", translation: "ударять, попадать" },
+  { base: "hold", past: "held", participle: "held", translation: "держать" },
+  { base: "hurt", past: "hurt", participle: "hurt", translation: "причинять боль" },
+  { base: "keep", past: "kept", participle: "kept", translation: "сохранять, соблюдать" },
+  { base: "know", past: "knew", participle: "known", translation: "знать" },
+  { base: "lay", past: "laid", participle: "laid", translation: "класть" },
+  { base: "lead", past: "led", participle: "led", translation: "вести, лидировать" },
+  { base: "learn", past: "learnt(learned)", participle: "learnt(learned)", translation: "учиться, узнавать" },
+  { base: "leave", past: "left", participle: "left", translation: "покидать, оставлять" },
+  { base: "lend", past: "lent", participle: "lent", translation: "давать взаймы" },
+  { base: "let", past: "let", participle: "let", translation: "позволять" },
+  { base: "lie", past: "lay", participle: "lain", translation: "лежать" },
+  { base: "light", past: "lit", participle: "lit", translation: "зажигать, освещать" },
+  { base: "lose", past: "lost", participle: "lost", translation: "терять" },
+  { base: "make", past: "made", participle: "made", translation: "делать, мастерить" },
+  { base: "mean", past: "meant", participle: "meant", translation: "значить" },
+  { base: "meet", past: "met", participle: "met", translation: "встречать, знакомиться" },
+  { base: "pay", past: "paid", participle: "paid", translation: "платить" },
+  { base: "put", past: "put", participle: "put", translation: "класть, ставить" },
+  { base: "read", past: "read", participle: "read", translation: "читать" },
+  { base: "ride", past: "rode", participle: "ridden", translation: "ездить верхом" },
+  { base: "ring", past: "rang", participle: "rung", translation: "звонить" },
+  { base: "rise", past: "rose", participle: "risen", translation: "возрастать, подниматься" },
+  { base: "run", past: "ran", participle: "run", translation: "бежать" },
+  { base: "say", past: "said", participle: "said", translation: "сказать" },
+  { base: "see", past: "saw", participle: "seen", translation: "видеть" },
+  { base: "seek", past: "sought", participle: "sought", translation: "искать" },
+  { base: "sell", past: "sold", participle: "sold", translation: "продавать" },
+  { base: "send", past: "sent", participle: "sent", translation: "посылать" },
+  { base: "set", past: "set", participle: "set", translation: "устанавливать" },
+  { base: "shake", past: "shook", participle: "shaken", translation: "трясти" },
+  { base: "shine", past: "shone", participle: "shone", translation: "светить, сиять" },
+  { base: "shoot", past: "shot", participle: "shot", translation: "стрелять" },
+  { base: "show", past: "showed", participle: "shown", translation: "показывать" },
+  { base: "shrink", past: "shrank", participle: "shrunk", translation: "сжиматься" },
+  { base: "shut", past: "shut", participle: "shut", translation: "закрывать, затворять" },
+  { base: "sing", past: "sang", participle: "sung", translation: "петь" },
+  { base: "sit", past: "sat", participle: "sat", translation: "сидеть" },
+  { base: "sleep", past: "slept", participle: "slept", translation: "спать" },
+  { base: "slide", past: "slid", participle: "slid", translation: "скользить" },
+  { base: "smell", past: "smelt", participle: "smelt", translation: "пахнуть, нюхать" },
+  { base: "speak", past: "spoke", participle: "spoken", translation: "говорить" },
+  { base: "spell", past: "spelt(spelled)", participle: "spelt(spelled)", translation: "произносить или писать по буквам" },
+  { base: "spend", past: "spent", participle: "spent", translation: "тратить, проводить время" },
+  { base: "spill", past: "spilt(spilled)", participle: "spilt(spilled)", translation: "разлить" },
+  { base: "spin", past: "spun", participle: "spun", translation: "крутить" },
+  { base: "split", past: "split", participle: "split", translation: "разделять, раскалывать" },
+  { base: "spoil", past: "spoilt(spoiled)", participle: "spoilt(spoiled)", translation: "портить" },
+  { base: "spread", past: "spread", participle: "spread", translation: "разворачивать, распространять" },
+  { base: "stand", past: "stood", participle: "stood", translation: "стоять" },
+  { base: "steal", past: "stole", participle: "stolen", translation: "воровать" },
+  { base: "sting", past: "stung", participle: "stung", translation: "жалить" },
+  { base: "stink", past: "stank", participle: "stunk", translation: "вонять" },
+  { base: "strike", past: "struck", participle: "struck", translation: "бастовать, ударять" },
+  { base: "swear", past: "swore", participle: "sworn", translation: "клясться, ругаться" },
+  { base: "sweep", past: "swept", participle: "swept", translation: "подметать" },
+  { base: "swell", past: "swelled", participle: "swollen(swelled)", translation: "опухать" },
+  { base: "swim", past: "swam", participle: "swum", translation: "плавать" },
+  { base: "take", past: "took", participle: "taken", translation: "брать" },
+  { base: "teach", past: "taught", participle: "taught", translation: "обучать" },
+  { base: "tear", past: "tore", participle: "torn", translation: "рвать" },
+  { base: "tell", past: "told", participle: "told", translation: "рассказывать" },
+  { base: "think", past: "thought", participle: "thought", translation: "думать" },
+  { base: "throw", past: "threw", participle: "thrown", translation: "бросать" },
+  { base: "understand", past: "understood", participle: "understood", translation: "понимать" },
+  { base: "wake", past: "woke", participle: "woken", translation: "будить" },
+  { base: "wear", past: "wore", participle: "worn", translation: "носить(одежду)" },
+  { base: "win", past: "won", participle: "won", translation: "побеждать" },
+  { base: "wind", past: "wound", participle: "wound", translation: "обматывать, изгибаться" },
+  { base: "write", past: "wrote", participle: "written", translation: "писать" }
+];
+
+let currentVerbIndex = 0;
+let correctAnswers = 0;
+
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
+function loadVerb() {
+  const verb = verbs[currentVerbIndex];
+  document.getElementById('current-verb').textContent = verb.base;
+  document.getElementById('past-simple-input').value = '';
+  document.getElementById('participle-ii-input').value = '';
+  document.getElementById('feedback').textContent = '';
+}
+
+function checkAnswer() {
+  const verb = verbs[currentVerbIndex];
+  const pastSimpleInput = document.getElementById('past-simple-input').value.trim();
+  const participleIIInput = document.getElementById('participle-ii-input').value.trim();
+
+  let isCorrect = true;
+  let feedback = '';
+
+  if (pastSimpleInput !== verb.past) {
+    isCorrect = false;
+    feedback += `Неправильно! Правильная форма Past Simple: ${verb.past}. `;
+  }
+
+  if (participleIIInput !== verb.participle) {
+    isCorrect = false;
+    feedback += `Неправильно! Правильная форма Past Participle II: ${verb.participle}. `;
+  }
+
+  if (isCorrect) {
+    correctAnswers++;
+    feedback = 'Правильно!';
+    document.getElementById('feedback').style.color = 'green';
+  } else {
+    document.getElementById('feedback').style.color = 'red';
+  }
+
+  document.getElementById('feedback').textContent = feedback;
+  updateProgress();
+}
+
+function nextVerb() {
+  currentVerbIndex = (currentVerbIndex + 1) % verbs.length;
+  loadVerb();
+}
+
+function updateProgress() {
+  const progressText = `${correctAnswers}/${verbs.length}`;
+  document.getElementById('progress').textContent = progressText;
+  const progressBar = document.getElementById('progress-bar');
+  progressBar.style.width = `${(correctAnswers / verbs.length) * 100}%`;
+  progressBar.textContent = progressText;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  shuffleArray(verbs);
+  loadVerb();
+});
+</script>
+
+</body>
+</html>
+```
