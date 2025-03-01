@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -177,7 +176,11 @@ function loadVerb() {
   document.getElementById('feedback').textContent = '';
 }
 
-function checkAnswer() {
+function checkAnswer(event) {
+  if (event && event.key === 'Enter') {
+    event.preventDefault();
+  }
+
   const verb = verbs[currentVerbIndex];
   const pastSimpleInput = document.getElementById('past-simple-input').value.trim();
   const participleIIInput = document.getElementById('participle-ii-input').value.trim();
@@ -223,9 +226,24 @@ function updateProgress() {
 document.addEventListener('DOMContentLoaded', () => {
   shuffleArray(verbs);
   loadVerb();
+
+  // Add event listeners for Enter key press in both input fields
+  const pastSimpleInput = document.getElementById('past-simple-input');
+  const participleIIInput = document.getElementById('participle-ii-input');
+
+  pastSimpleInput.addEventListener('keypress', (event) => {
+    if (event.key === 'Enter') {
+      checkAnswer(event);
+    }
+  });
+
+  participleIIInput.addEventListener('keypress', (event) => {
+    if (event.key === 'Enter') {
+      checkAnswer(event);
+    }
+  });
 });
 </script>
 
 </body>
 </html>
-```
